@@ -84,7 +84,7 @@ if ticker:
         st.error(f"📉 Verwachte daling in de komende {horizon_label}")
     st.write(f"📌 Verwachte prijs: **${future_price:.2f}** (Huidige prijs: ${current_price:.2f})")
 
-    st.subheader("📉 Historische koers + voorspelling")
+       st.subheader("📉 Historische koers + voorspelling")
     fig, ax = plt.subplots()
     df['Close'].plot(ax=ax, label='Historisch')
 
@@ -95,4 +95,7 @@ if ticker:
     else:
         time_ahead = pd.Timedelta(days=horizon)
 
-    ax.scatter(df.index[-1] + time_a_
+    ax.scatter(df.index[-1] + time_ahead, future_price,
+               color='green' if direction == 1 else 'red', label='Voorspeld', zorder=5)
+    ax.legend()
+    st.pyplot(fig)
