@@ -1,4 +1,3 @@
-
 import streamlit as st
 import yfinance as yf
 import pandas as pd
@@ -28,6 +27,8 @@ horizon = horizon_map[horizon_label]
 
 if ticker:
     df = yf.download(ticker, period='6mo', interval='1d')
+    df.index = pd.to_datetime(df.index)  # ✅ FIX: zet index om naar datetime
+
     df['Return'] = df['Close'].pct_change()
     df['Target'] = (df['Close'].shift(-horizon) > df['Close']).astype(int)
     df['Target_Price'] = df['Close'].shift(-horizon)
