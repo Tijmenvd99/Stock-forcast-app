@@ -84,7 +84,7 @@ if ticker:
         st.error(f"📉 Verwachte daling in de komende {horizon_label}")
     st.write(f"📌 Verwachte prijs: **${future_price:.2f}** (Huidige prijs: ${current_price:.2f})")
 
-       st.subheader("📉 Historische koers + voorspelling")
+    st.subheader("📉 Historische koers + voorspelling")
     fig, ax = plt.subplots()
     df['Close'].plot(ax=ax, label='Historisch')
 
