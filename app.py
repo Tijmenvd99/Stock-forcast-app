@@ -23,16 +23,17 @@ horizon_map = {
 }
 
 horizon_label = st.selectbox('Voorspel vooruit over:', list(horizon_map.keys()))
-horizon = horizon_map[horizon_label]
+horizon = int(horizon_map[horizon_label])  # ✅ Altijd integer
 
 if ticker:
     df = yf.download(ticker, period='6mo', interval='1d')
-    df.index = pd.to_datetime(df.index)  # ✅ FIX: zet index om naar datetime
+    df.index = pd.to_datetime(df.index)  # ✅ Zorg dat index datetime is
 
     df['Return'] = df['Close'].pct_change()
     df['Target'] = (df['Close'].shift(-horizon) > df['Close']).astype(int)
     df['Target_Price'] = df['Close'].shift(-horizon)
 
+    # Technische indicatoren
     df['SMA_10'] = df['Close'].rolling(window=10).mean()
     df['EMA_10'] = df['Close'].ewm(span=10, adjust=False).mean()
 
@@ -48,6 +49,7 @@ if ticker:
 
     df.dropna(inplace=True)
 
+    # Model input/output
     features = ['Close', 'SMA_10', 'EMA_10', 'RSI_14', 'MACD']
     X = df[features]
     y_class = df['Target']
@@ -66,6 +68,7 @@ if ticker:
     y_reg_pred = reg.predict(X_test)
     mae = mean_absolute_error(y_reg_test, y_reg_pred)
 
+    # Laatste data en voorspelling
     last_data = X.tail(1)
     direction = clf.predict(last_data)[0]
     future_price = reg.predict(last_data)[0]
@@ -85,8 +88,11 @@ if ticker:
     fig, ax = plt.subplots()
     df['Close'].plot(ax=ax, label='Historisch')
 
+    # ✅ Tijdseenheid bepalen en tijdstip voorspelling berekenen
     unit = "hours" if "uur" in horizon_label else "days"
-    ax.scatter(df.index[-1] + pd.Timedelta(**{unit: horizon}), future_price,
-               color='green' if direction == 1 else 'red', label='Voorspeld', zorder=5)
-    ax.legend()
-    st.pyplot(fig)
+    if unit == "hours":
+        time_ahead = pd.Timedelta(hours=horizon)
+    else:
+        time_ahead = pd.Timedelta(days=horizon)
+
+    ax.scatter(df.index[-1] + time_a_
