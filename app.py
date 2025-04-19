@@ -26,11 +26,9 @@ horizon_label = st.selectbox('Voorspel vooruit over:', list(horizon_map.keys()))
 horizon = int(horizon_map[horizon_label])
 
 if ticker:
-    # Data ophalen
     df = yf.download(ticker, period='6mo', interval='1d')
     df.index = pd.to_datetime(df.index)
 
-    # Doelvariabelen
     df['Return'] = df['Close'].pct_change()
     df['Target'] = (df['Close'].shift(-horizon) > df['Close']).astype(int)
     df['Target_Price'] = df['Close'].shift(-horizon)
@@ -45,50 +43,44 @@ if ticker:
     rs = gain / loss
     df['RSI_14'] = 100 - (100 / (1 + rs))
 
-    # MACD berekening
     ema_12 = df['Close'].ewm(span=12, adjust=False).mean()
     ema_26 = df['Close'].ewm(span=26, adjust=False).mean()
     df['MACD'] = ema_12 - ema_26
 
     df.dropna(inplace=True)
 
-    # Features en labels
     features = ['Close', 'SMA_10', 'EMA_10', 'RSI_14', 'MACD']
     X = df[features]
     y_class = df['Target']
     y_reg = df['Target_Price']
 
-    # Train/test split
     X_train, X_test, y_class_train, y_class_test = train_test_split(X, y_class, test_size=0.2, shuffle=False)
     _, _, y_reg_train, y_reg_test = train_test_split(X, y_reg, test_size=0.2, shuffle=False)
 
-    # Classificatie-model
     clf = RandomForestClassifier(n_estimators=100, random_state=42)
     clf.fit(X_train, y_class_train)
     y_class_pred = clf.predict(X_test)
     accuracy = accuracy_score(y_class_test, y_class_pred)
 
-    # Regressie-model
     reg = RandomForestRegressor(n_estimators=100, random_state=42)
     reg.fit(X_train, y_reg_train)
     y_reg_pred = reg.predict(X_test)
     mae = mean_absolute_error(y_reg_test, y_reg_pred)
 
-    # Laatste datapunt voorspellen
     last_data = X.tail(1)
     direction = clf.predict(last_data)[0]
     future_price = reg.predict(last_data)[0]
-    current_price = df['Close'].iloc[-1]
 
-    # Veiligheid voor NaN
-    if pd.isna(current_price):
-        current_price_text = "Onbekend"
-    else:
+    # Fix voor current_price
+    try:
+        current_price = float(df['Close'].iloc[-1])
         current_price_text = f"${current_price:.2f}"
+    except:
+        current_price = None
+        current_price_text = "Onbekend"
 
     future_price_text = f"${future_price:.2f}"
 
-    # Metrics tonen
     st.metric('Model Accuratesse (richting)', f'{accuracy * 100:.2f}%')
     st.metric('Gemiddelde prijsafwijking (MAE)', f'${mae:.2f}')
 
@@ -100,7 +92,6 @@ if ticker:
 
     st.write(f"📌 Verwachte prijs: **{future_price_text}** (Huidige prijs: {current_price_text})")
 
-    # Grafiek met voorspelling
     st.subheader("📉 Historische koers + voorspelling")
     fig, ax = plt.subplots()
     df['Close'].plot(ax=ax, label='Historisch')
