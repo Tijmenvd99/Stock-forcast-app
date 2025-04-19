@@ -80,10 +80,10 @@ if ticker:
     current_price = df['Close'].iloc[-1]
 
     # Checken of current_price een geldige waarde is
-    if np.isnan(current_price):
-        current_price_text = "Onbekend"
-    else:
-        current_price_text = f"${current_price:.2f}"
+ if pd.isna(current_price):
+    current_price_text = "Onbekend"
+else:
+    current_price_text = f"${current_price:.2f}"
 
     # Metrics tonen
     st.metric('Model Accuratesse (richting)', f'{accuracy * 100:.2f}%')
