@@ -91,7 +91,7 @@ if ticker:
         st.error(f"📉 Verwachte daling in de komende {horizon_label}")
 
     # **Let op deze regel**: correcte f-string met beide haakjes goed gesloten
-    st.write(f"📌 Verwachte prijs: **${future_price:.2f}** (Huidige prijs: $ {"f"...current_price:.2f})")
+    st.write(f"📌 Verwachte prijs: **${future_price:.2f}** (Huidige prijs: ${current_price:.2f})")
 
     # Grafiek
     st.subheader("📉 Historische koers + voorspelling")
