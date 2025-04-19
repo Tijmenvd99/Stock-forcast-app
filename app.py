@@ -79,6 +79,12 @@ if ticker:
     future_price = reg.predict(last_data)[0]
     current_price = df['Close'].iloc[-1]
 
+    # Checken of current_price een geldige waarde is
+    if np.isnan(current_price):
+        current_price_text = "Onbekend"
+    else:
+        current_price_text = f"${current_price:.2f}"
+
     # Metrics tonen
     st.metric('Model Accuratesse (richting)', f'{accuracy * 100:.2f}%')
     st.metric('Gemiddelde prijsafwijking (MAE)', f'${mae:.2f}')
@@ -92,7 +98,6 @@ if ticker:
 
     # Prijsformattering gesplitst in aparte variabelen
     future_price_text = f"${future_price:.2f}"
-    current_price_text = f"${current_price:.2f}"
     st.write(f"📌 Verwachte prijs: **{future_price_text}** (Huidige prijs: {current_price_text})")
 
     # Grafiek
