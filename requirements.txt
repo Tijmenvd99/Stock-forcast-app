@@ -1,5 +1,6 @@
 streamlit
-yfinance
+yfinance>=0.2.31
+appdirs
 pandas
 numpy
 scikit-learn
